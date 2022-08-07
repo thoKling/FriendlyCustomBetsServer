@@ -9,5 +9,7 @@ class Game(
     val id: Long?,
 
     @OneToMany
-    val bets: ArrayList<Bet>,
+    val bets: MutableList<Bet>,
+
+    val name: String,
 )

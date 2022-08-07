@@ -9,5 +9,5 @@ class User(
     val id: Long?,
 
     @OneToMany
-    val participatingTournaments: ArrayList<Tournament>,
+    val participatingTournaments: MutableList<Tournament>,
 )
