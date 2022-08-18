@@ -8,8 +8,14 @@ class Tournament(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long?,
 
+    val name: String,
+
     @OneToMany
     val games: MutableList<Game>,
 
-    val name: String,
+    @OneToOne
+    val owner: User,
+
+    @OneToMany
+    val participants: MutableList<User>,
 )
