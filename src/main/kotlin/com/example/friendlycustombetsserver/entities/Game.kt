@@ -6,10 +6,10 @@ import javax.persistence.*
 @Table(name = "game")
 class Game(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long?,
+    val id: Long? = null,
 
     @OneToMany
-    val bets: MutableList<Bet>,
+    val bets: MutableList<Bet> = mutableListOf(),
 
     val name: String,
 )

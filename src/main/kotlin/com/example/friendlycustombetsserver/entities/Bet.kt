@@ -6,7 +6,7 @@ import javax.persistence.*
 @Table(name = "bet")
 class Bet(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long?,
+    val id: Long? = null,
 
-    val odd: Int,
+    val amount: Int,
 )
