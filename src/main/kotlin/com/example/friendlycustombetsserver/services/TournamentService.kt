@@ -1,6 +1,7 @@
 package com.example.friendlycustombetsserver.services
 
 import com.example.friendlycustombetsserver.entities.*
+import com.example.friendlycustombetsserver.repositories.GameRepository
 import com.example.friendlycustombetsserver.repositories.TournamentRepository
 import com.example.friendlycustombetsserver.repositories.UserTournamentTokensRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service
 @Service
 class TournamentService(
     val tournamentRepository: TournamentRepository,
+    val gameRepository: GameRepository,
     val userTournamentRepository: UserTournamentTokensRepository
 ) {
     fun createTournament(tournamentName: String, owner: User): MyTournament {
@@ -68,17 +70,24 @@ class TournamentService(
         }
     }
 
-    fun addGame(user: User, tournamentId: Long, gameName: String): Game {
-        val tournament: Tournament? = getTournament(tournamentId)
-        if (tournament == null) {
-            throw Exception("Ce tournoi n'existe pas")
-        } else if (tournament.owner != user) {
-            throw Exception("Vous n'avez pas les droits")
+    fun buildMyTournament(user: User, tournament: Tournament): MyTournament {
+        val utt = userTournamentRepository.findByUserAndTournamentId(user, tournament.id!!)
+            ?: throw Exception("Impossible de trouver le tournoi")
+
+        return MyTournament(tournament, utt.tokens)
+    }
+
+    fun addGame(user: User, tournamentId: Long, game: Game): MyTournament {
+        val tournament = getTournament(tournamentId)
+            ?: throw Exception("Ce tournoi n'existe pas")
+
+        if (tournament.owner != user) {
+            throw Exception("Vous n'avez pas les droits pour ajouter une partie à ce tournoi")
         } else {
-            val game = Game(name = gameName)
-            tournament.games.add(game)
+            val savedGame = gameRepository.save(game)
+            tournament.games.add(savedGame)
             tournamentRepository.save(tournament)
-            return game
+            return buildMyTournament(user, tournament)
         }
     }
 }

@@ -52,7 +52,7 @@ class SecurityConfig {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.csrf().disable().authorizeRequests()
-            .mvcMatchers("/tournament/myTournaments").authenticated()
+            .mvcMatchers("/tournament/**").authenticated()
             .and().cors()
             .and().oauth2ResourceServer().jwt()
 

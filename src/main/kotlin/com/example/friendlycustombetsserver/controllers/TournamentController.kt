@@ -1,6 +1,6 @@
 package com.example.friendlycustombetsserver.controllers
 
-import com.example.friendlycustombetsserver.entities.Game
+import com.example.friendlycustombetsserver.dto.request.AddGameToTournamentRequest
 import com.example.friendlycustombetsserver.entities.MyTournament
 import com.example.friendlycustombetsserver.services.TournamentService
 import com.example.friendlycustombetsserver.services.UserService
@@ -78,11 +78,10 @@ class TournamentController(val tournamentService: TournamentService, val userSer
     )
     fun addGame(
         principal: Principal,
-        @RequestBody tournamentId: Long,
-        @RequestBody gameName: String,
-    ): Game {
+        @RequestBody request: AddGameToTournamentRequest,
+    ): MyTournament {
         val user = userService.getUserOrCreate(principal)
 
-        return tournamentService.addGame(user, tournamentId, gameName)
+        return tournamentService.addGame(user, request.tournamentId, request.game)
     }
 }
