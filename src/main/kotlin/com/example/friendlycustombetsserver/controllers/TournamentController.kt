@@ -7,12 +7,15 @@ import com.example.friendlycustombetsserver.services.UserService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.security.SecurityRequirements
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
 
 @RestController
 @RequestMapping("/tournament")
+@SecurityRequirements(value = [SecurityRequirement(name = "Auth0")])
 class TournamentController(val tournamentService: TournamentService, val userService: UserService) {
     @GetMapping("/myTournaments")
     @Operation(summary = "Fetch all tournaments where user participate", operationId = "getMyTournaments")

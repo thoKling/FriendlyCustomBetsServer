@@ -1,15 +1,12 @@
 package com.example.friendlycustombetsserver.security
 
-import org.springframework.beans.factory.annotation.Autowired
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
+import io.swagger.v3.oas.annotations.security.*
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
-import org.springframework.security.config.annotation.authentication.configurers.userdetails.DaoAuthenticationConfigurer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.core.OAuth2TokenValidator
 import org.springframework.security.oauth2.jwt.*
@@ -21,6 +18,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
+@SecurityScheme(
+    name = "Auth0",
+    type = SecuritySchemeType.OAUTH2,
+    flows = OAuthFlows(
+        implicit = OAuthFlow(
+            authorizationUrl = "https:/dev-sponge.eu.auth0.com/authorize?audience=https://friendly-custom-bets-api.sponge.com"
+        )
+    )
+)
 class SecurityConfig {
     @Value("\${auth0.audience}")
     private val audience: String? = null
@@ -32,8 +38,9 @@ class SecurityConfig {
     fun corsConfigurationSource(): CorsConfigurationSource? {
         val configuration = CorsConfiguration()
         configuration.allowedOrigins = listOf("*")
-        configuration.allowedMethods = listOf("GET","POST")
-        configuration.allowedHeaders = listOf("Origin", "Content-Type", "Authorization", "Access-Control-Allow-Credentials")
+        configuration.allowedMethods = listOf("GET", "POST")
+        configuration.allowedHeaders =
+            listOf("Origin", "Content-Type", "Authorization", "Access-Control-Allow-Credentials")
         configuration.allowCredentials = true
 
         val source = UrlBasedCorsConfigurationSource()
@@ -44,20 +51,24 @@ class SecurityConfig {
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.authorizeRequests()
+        http.csrf().disable().authorizeRequests()
             .mvcMatchers("/tournament/myTournaments").authenticated()
             .and().cors()
-            .and().oauth2ResourceServer().jwt().decoder(jwtDecoder())
+            .and().oauth2ResourceServer().jwt()
 
         return http.build()
     }
 
+    @Bean
     fun jwtDecoder(): JwtDecoder? {
-        //val withAudience: OAuth2TokenValidator<Jwt> = AudienceValidator(audience) TODO: j'ai pas tout compris de comment ça marche ça
-        val withIssuer: OAuth2TokenValidator<Jwt> = JwtValidators.createDefaultWithIssuer(issuer)
-        val validator: OAuth2TokenValidator<Jwt> = DelegatingOAuth2TokenValidator(withIssuer)
         val jwtDecoder = JwtDecoders.fromOidcIssuerLocation<JwtDecoder>(issuer) as NimbusJwtDecoder
-        jwtDecoder.setJwtValidator(validator)
+
+        val audienceValidator: OAuth2TokenValidator<Jwt> = AudienceValidator(audience)
+        val withIssuer = JwtValidators.createDefaultWithIssuer(issuer)
+        val withAudience: OAuth2TokenValidator<Jwt> = DelegatingOAuth2TokenValidator(withIssuer, audienceValidator)
+
+        jwtDecoder.setJwtValidator(withAudience)
+
         return jwtDecoder
     }
 }
