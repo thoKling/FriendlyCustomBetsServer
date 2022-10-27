@@ -1,6 +1,5 @@
 package com.example.friendlycustombetsserver.controllers
 
-import com.example.friendlycustombetsserver.dto.request.AddGameToTournamentRequest
 import com.example.friendlycustombetsserver.entities.MyTournament
 import com.example.friendlycustombetsserver.services.TournamentService
 import com.example.friendlycustombetsserver.services.UserService
@@ -67,21 +66,5 @@ class TournamentController(val tournamentService: TournamentService, val userSer
         val user = userService.getUserOrCreate(principal)
 
         return tournamentService.joinTournament(user, tournamentId)
-    }
-
-    @PostMapping("/addGame")
-    @Operation(summary = "Add a new game to a Tournament", operationId = "addGameToTournament")
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Successfully added a new Game to this Tournament"),
-        ]
-    )
-    fun addGame(
-        principal: Principal,
-        @RequestBody request: AddGameToTournamentRequest,
-    ): MyTournament {
-        val user = userService.getUserOrCreate(principal)
-
-        return tournamentService.addGame(user, request.tournamentId, request.game)
     }
 }

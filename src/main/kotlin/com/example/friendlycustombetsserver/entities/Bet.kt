@@ -8,5 +8,7 @@ class Bet(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    val amount: Int,
+    val name: String,
+
+    val odd: Float,
 )
