@@ -5,6 +5,4 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface BetRepository : CrudRepository<Bet, Long> {
-    fun save(bet: Bet): Bet
-}
+interface BetRepository : CrudRepository<Bet, Long>

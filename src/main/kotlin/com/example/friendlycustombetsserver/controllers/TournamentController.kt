@@ -2,7 +2,6 @@ package com.example.friendlycustombetsserver.controllers
 
 import com.example.friendlycustombetsserver.entities.MyTournament
 import com.example.friendlycustombetsserver.services.TournamentService
-import com.example.friendlycustombetsserver.services.UserService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -15,7 +14,7 @@ import java.security.Principal
 @RestController
 @RequestMapping("/tournament")
 @SecurityRequirements(value = [SecurityRequirement(name = "Auth0")])
-class TournamentController(val tournamentService: TournamentService, val userService: UserService) {
+class TournamentController(private val tournamentService: TournamentService) {
     @GetMapping("/myTournaments")
     @Operation(summary = "Fetch all tournaments where user participate", operationId = "getMyTournaments")
     @ApiResponses(
@@ -24,9 +23,7 @@ class TournamentController(val tournamentService: TournamentService, val userSer
         ]
     )
     fun myTournaments(principal: Principal): List<MyTournament> {
-        val user = userService.getUserOrCreate(principal)
-
-        return tournamentService.getMyTournaments(user)
+        return tournamentService.getMyTournaments(principal)
     }
 
     @GetMapping("/{tournamentId}")
@@ -37,9 +34,7 @@ class TournamentController(val tournamentService: TournamentService, val userSer
         ]
     )
     fun tournament(principal: Principal, @PathVariable tournamentId: Long): MyTournament {
-        val user = userService.getUserOrCreate(principal)
-
-        return tournamentService.getTournament(user, tournamentId)
+        return tournamentService.getMyTournament(principal, tournamentId)
     }
 
     @PostMapping("/create")
@@ -50,9 +45,7 @@ class TournamentController(val tournamentService: TournamentService, val userSer
         ]
     )
     fun create(principal: Principal, @RequestBody tournamentName: String): MyTournament {
-        val user = userService.getUserOrCreate(principal)
-
-        return tournamentService.createTournament(tournamentName, user)
+        return tournamentService.createTournament(principal, tournamentName)
     }
 
     @PostMapping("/join")
@@ -63,8 +56,6 @@ class TournamentController(val tournamentService: TournamentService, val userSer
         ]
     )
     fun join(principal: Principal, @RequestBody tournamentId: Long): MyTournament {
-        val user = userService.getUserOrCreate(principal)
-
-        return tournamentService.joinTournament(user, tournamentId)
+        return tournamentService.joinTournament(principal, tournamentId)
     }
 }
