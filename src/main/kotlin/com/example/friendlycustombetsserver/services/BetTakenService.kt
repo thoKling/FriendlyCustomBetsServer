@@ -1,6 +1,7 @@
 package com.example.friendlycustombetsserver.services
 
 import com.example.friendlycustombetsserver.dto.requests.TakeBetRequest
+import com.example.friendlycustombetsserver.dto.responses.TakeBetResponse
 import com.example.friendlycustombetsserver.entities.BetTaken
 import com.example.friendlycustombetsserver.repositories.BetTakenRepository
 import org.springframework.stereotype.Service
@@ -9,7 +10,8 @@ import java.security.Principal
 @Service
 class BetTakenService(
     private val betTakenRepository: BetTakenRepository,
-    private val verifyService: VerifyService
+    private val verifyService: VerifyService,
+    private val tournamentService: TournamentService
 ) {
     fun takeBet(
         principal: Principal,
@@ -17,7 +19,7 @@ class BetTakenService(
         gameId: Long,
         betId: Long,
         request: TakeBetRequest
-    ): BetTaken {
+    ): TakeBetResponse {
         val tournament = verifyService.verifyTournament(tournamentId)
         val user = verifyService.verifyUserParticipateInTournament(principal, tournament)
         val bet = verifyService.verifyBet(betId)
@@ -28,8 +30,10 @@ class BetTakenService(
             tokensAmount = request.tokensAmount
         )
 
-        betTakenRepository.save(betTaken)
+        val newBetTaken = betTakenRepository.save(betTaken)
 
-        return betTaken
+        tournamentService.removeTokenFromUser(user, tournament, request.tokensAmount)
+
+        return TakeBetResponse(newBetTaken, tournamentService.buildMyTournament(user, tournament))
     }
 }

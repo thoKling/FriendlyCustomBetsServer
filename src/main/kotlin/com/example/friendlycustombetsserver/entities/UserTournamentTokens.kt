@@ -16,5 +16,5 @@ class UserTournamentTokens(
     @ManyToOne
     val tournament: Tournament,
 
-    val tokens: Float
+    var tokens: Float
 )

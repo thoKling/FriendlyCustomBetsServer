@@ -63,6 +63,18 @@ class TournamentService(
         }
     }
 
+    fun removeTokenFromUser(user: User, tournament: Tournament, amount: Float) {
+        val utt = userTournamentRepository.findByUserAndTournamentId(user, tournament.id!!)
+            ?: throw Exception("Impossible de trouver le joueur dans ce tournoi")
+
+        if (utt.tokens < amount) {
+            throw Exception("Pas assez de jetons")
+        }
+
+        utt.tokens -= amount
+        userTournamentRepository.save(utt)
+    }
+
     fun joinTournament(principal: Principal, tournamentId: Long): MyTournament {
         val tournament = verifyService.verifyTournament(tournamentId)
         val user = userService.getUserOrCreate(principal)

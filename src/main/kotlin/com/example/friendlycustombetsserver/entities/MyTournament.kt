@@ -6,7 +6,7 @@ package com.example.friendlycustombetsserver.entities
  */
 class MyTournament(
     tournament: Tournament,
-    val myTokens: Float,
+    var myTokens: Float,
 ) :
     Tournament(
         tournament.id,

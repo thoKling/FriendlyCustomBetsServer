@@ -1,7 +1,7 @@
 package com.example.friendlycustombetsserver.controllers
 
 import com.example.friendlycustombetsserver.dto.requests.TakeBetRequest
-import com.example.friendlycustombetsserver.entities.BetTaken
+import com.example.friendlycustombetsserver.dto.responses.TakeBetResponse
 import com.example.friendlycustombetsserver.services.BetTakenService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -31,7 +31,7 @@ class BetTakenController(
         @PathVariable tournamentId: Long,
         @PathVariable gameId: Long,
         @PathVariable betId: Long,
-    ): BetTaken {
+    ): TakeBetResponse {
         return betTakenService.takeBet(
             principal,
             tournamentId,
